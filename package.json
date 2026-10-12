@@ -4,6 +4,7 @@
   "description": "Modern Responsive Frontend for Blood Bank Management System",
   "main": "server.js",
   "scripts": {
+    "build": "echo 'Static frontend build complete'",
     "start": "node server.js"
   },
   "keywords": [

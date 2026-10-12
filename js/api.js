@@ -3,7 +3,9 @@
  * Seamlessly interfaces with Spring Boot REST Endpoints with automatic fallback store
  */
 
-const API_BASE_URL = (window.location.port === '8080') ? '' : 'http://localhost:8080';
+const API_BASE_URL = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+  ? (window.location.port === '8080' ? '' : 'http://localhost:8080')
+  : 'https://bloodbank-backend-0kjo.onrender.com';
 
 // Initial Mock Seed Store (Used if Spring Boot backend is starting or offline)
 const DEFAULT_STORE = {
