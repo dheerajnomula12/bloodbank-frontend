@@ -1,0 +1,17 @@
+{
+  "name": "pulse-life-blood-bank-frontend",
+  "version": "1.0.0",
+  "description": "Modern Responsive Frontend for Blood Bank Management System",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "keywords": [
+    "blood-bank",
+    "healthcare",
+    "dashboard",
+    "frontend"
+  ],
+  "author": "",
+  "license": "MIT"
+}

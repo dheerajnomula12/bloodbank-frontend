@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PulseLife - Advanced Blood Bank Management System</title>
+  <meta name="description" content="Centralized enterprise Blood Bank Management System for managing blood donors, stock inventory, collection, emergency requests, and distribution.">
+  
+  <!-- Google Fonts: Outfit & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  
+  <!-- Main Stylesheet -->
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <!-- =========================================================
+       Navigation Bar
+       ========================================================= -->
+  <header class="navbar">
+    <div class="container nav-content">
+      <div class="brand-logo" onclick="navigateToView('home')">
+        <div class="brand-icon">🩸</div>
+        <div>Pulse<span style="color: #ff4d6d;">Life</span> <span style="font-size: 0.7rem; font-weight: 600; color: var(--text-muted); letter-spacing: 1px; display: block; line-height: 1;">BLOOD BANK SYSTEM</span></div>
+      </div>
+
+      <ul class="nav-links">
+        <li class="nav-item active" data-view-target="home">Home</li>
+        <li class="nav-item" data-view-target="donor">Donor Portal</li>
+        <li class="nav-item" data-view-target="patient">Patient Portal</li>
+        <li class="nav-item" data-view-target="admin">Admin Dashboard</li>
+      </ul>
+
+      <div class="nav-actions">
+        <div class="emergency-pill">
+          <span class="pulsing-dot"></span>
+          <span>Emergency: 1-800-BLOOD-99</span>
+        </div>
+
+        <button id="navAuthBtn" class="btn btn-primary btn-sm" data-open-modal="authModal">
+          Sign In / Register
+        </button>
+
+        <div id="navUserPill" style="display: none; align-items: center; gap: 0.75rem;">
+          <div style="text-align: right;">
+            <div id="navUserName" style="font-weight: 700; font-size: 0.9rem; color: #fff;">User</div>
+            <div id="navUserRole" style="font-size: 0.75rem; color: #ff6b6b; font-weight: 600;">Role</div>
+          </div>
+          <button id="logoutBtn" class="btn btn-secondary btn-sm" title="Logout">Logout</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- =========================================================
+       VIEW 1: PUBLIC LANDING & LIVE STOCK
+       ========================================================= -->
+  <main id="homeView">
+    <!-- Hero Section -->
+    <section class="hero-section">
+      <div class="container hero-grid">
+        <div>
+          <div class="hero-badge">
+            <span>✨</span> Next-Gen Automated Blood Bank Network
+          </div>
+          <h1 class="hero-title">
+            Every Drop Saves A Life. <br>
+            <span class="gradient-accent">Manage & Deliver Blood Faster.</span>
+          </h1>
+          <p class="hero-subtitle">
+            A centralized, real-time platform connecting donors, hospitals, and blood banks. 
+            Automated stock tracking, seamless donation bookings, and rapid emergency blood distribution.
+          </p>
+
+          <div class="hero-actions">
+            <button class="btn btn-primary btn-lg" onclick="prepareQuickDonation('O+')">
+              ❤️ Schedule Blood Donation
+            </button>
+            <button class="btn btn-secondary btn-lg" onclick="prepareQuickRequest('O-')">
+              🚨 Request Blood Urgently
+            </button>
+          </div>
+
+          <div class="hero-stats-row">
+            <div class="stat-item">
+              <div class="stat-number gradient-text" id="heroLivesCount">650+</div>
+              <div class="stat-label">Lives Impacted</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-number gradient-text" id="heroDonorsCount">120+</div>
+              <div class="stat-label">Active Donors</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-number gradient-text" id="heroUnitsCount">219</div>
+              <div class="stat-label">Units in Reserve</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-number gradient-text">24/7</div>
+              <div class="stat-label">Rapid Dispatch</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Hero Right: Live Mini Stock Status Card -->
+        <div class="hero-card">
+          <div class="card-header-flex">
+            <div>
+              <div class="card-title-sm">Live Blood Reserves</div>
+              <p style="font-size: 0.8rem; color: var(--text-muted);">Real-time inventory status</p>
+            </div>
+            <span class="badge badge-completed">● Live Sync</span>
+          </div>
+
+          <div id="miniStockGrid" class="mini-stock-grid">
+            <!-- Dynamically populated -->
+          </div>
+
+          <div style="margin-top: 1.25rem; text-align: center;">
+            <a href="#stock-section" class="btn btn-sm btn-secondary" style="width: 100%;">
+              View Detailed Stock Matrix ↓
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Detailed Blood Stock Inventory Section -->
+    <section id="stock-section" class="section">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-tag">Real-Time Inventory</span>
+          <h2 class="section-title">Blood Availability Monitor</h2>
+          <p class="section-desc">
+            Check current available units across all 8 blood groups. Inventory is updated live as collections and issuances occur.
+          </p>
+        </div>
+
+        <div id="publicStockGrid" class="stock-grid">
+          <!-- Dynamically populated cards for A+, A-, B+, B-, AB+, AB-, O+, O- -->
+        </div>
+      </div>
+    </section>
+
+    <!-- Interactive Blood Compatibility Matrix Section -->
+    <section class="section" style="background: rgba(255, 255, 255, 0.01); border-top: 1px solid var(--border-subtle); border-bottom: 1px solid var(--border-subtle);">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-tag">Interactive Guide</span>
+          <h2 class="section-title">Blood Compatibility Matrix</h2>
+          <p class="section-desc">
+            Select a blood type to instantly check transfusion compatibility — who can give blood and who can receive blood safely.
+          </p>
+        </div>
+
+        <div class="compatibility-container">
+          <div class="matrix-selector">
+            <button class="matrix-btn" data-group="A+">A+</button>
+            <button class="matrix-btn" data-group="A-">A-</button>
+            <button class="matrix-btn" data-group="B+">B+</button>
+            <button class="matrix-btn" data-group="B-">B-</button>
+            <button class="matrix-btn" data-group="AB+">AB+</button>
+            <button class="matrix-btn" data-group="AB-">AB-</button>
+            <button class="matrix-btn active" data-group="O+">O+</button>
+            <button class="matrix-btn" data-group="O-">O-</button>
+          </div>
+
+          <div class="compat-results-grid">
+            <div class="compat-box">
+              <div class="compat-box-title">
+                <span style="color: #ff4d6d;">🩸</span> Blood Type <strong id="selectedGroupLabel" style="color: #ff4d6d; margin: 0 4px;">O+</strong> Can GIVE TO:
+              </div>
+              <div id="canGiveToContainer" class="compat-chips-row">
+                <!-- Dynamically populated -->
+              </div>
+            </div>
+
+            <div class="compat-box">
+              <div class="compat-box-title">
+                <span style="color: #34d399;">💉</span> Blood Type Can RECEIVE FROM:
+              </div>
+              <div id="canReceiveFromContainer" class="compat-chips-row">
+                <!-- Dynamically populated -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Why Donate & Process Walkthrough -->
+    <section class="section">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-tag">Simple & Safe</span>
+          <h2 class="section-title">The 4-Step Donation Journey</h2>
+          <p class="section-desc">Donating blood is simple, painless, and takes less than 30 minutes from check-in to refreshment.</p>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem;">
+          <div class="stock-card">
+            <div style="font-size: 2rem; margin-bottom: 0.75rem;">1️⃣</div>
+            <h3 style="font-size: 1.2rem; margin-bottom: 0.5rem;">Registration</h3>
+            <p style="color: var(--text-secondary); font-size: 0.9rem;">Register online or check-in with your digital donor card at any certified center.</p>
+          </div>
+          <div class="stock-card">
+            <div style="font-size: 2rem; margin-bottom: 0.75rem;">2️⃣</div>
+            <h3 style="font-size: 1.2rem; margin-bottom: 0.5rem;">Health Screening</h3>
+            <p style="color: var(--text-secondary); font-size: 0.9rem;">Quick check of hemoglobin levels, blood pressure, temperature, and pulse.</p>
+          </div>
+          <div class="stock-card">
+            <div style="font-size: 2rem; margin-bottom: 0.75rem;">3️⃣</div>
+            <h3 style="font-size: 1.2rem; margin-bottom: 0.5rem;">Blood Collection</h3>
+            <p style="color: var(--text-secondary); font-size: 0.9rem;">Comfortable blood collection under sterile conditions taking just 8-10 minutes.</p>
+          </div>
+          <div class="stock-card">
+            <div style="font-size: 2rem; margin-bottom: 0.75rem;">4️⃣</div>
+            <h3 style="font-size: 1.2rem; margin-bottom: 0.5rem;">Refresh & Track</h3>
+            <p style="color: var(--text-secondary); font-size: 0.9rem;">Enjoy complimentary refreshments and track the life-saving impact of your donation.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- =========================================================
+       VIEW 2: ADMIN DASHBOARD
+       ========================================================= -->
+  <main id="adminView" class="portal-layout" style="display: none;">
+    <div class="container">
+      <div class="portal-header">
+        <div class="portal-welcome">
+          <div class="user-avatar-lg">⚡</div>
+          <div>
+            <h1 style="font-size: 1.85rem;">Administrator Control Center</h1>
+            <p style="color: var(--text-secondary); font-size: 0.95rem;">Manage blood inventory, review requests, verify donations, and issue audit certificates.</p>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 0.75rem;">
+          <button class="btn btn-secondary btn-sm" onclick="refreshAllData()">🔄 Refresh Data</button>
+          <button class="btn btn-primary btn-sm" onclick="openModal('stockAdjustModal')">➕ Adjust Inventory</button>
+        </div>
+      </div>
+
+      <!-- KPI Executive Metrics -->
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div>
+            <div class="kpi-title">Total Registered Donors</div>
+            <div class="kpi-value" id="adminKpiDonors">--</div>
+          </div>
+          <div class="kpi-icon icon-red">👥</div>
+        </div>
+
+        <div class="kpi-card">
+          <div>
+            <div class="kpi-title">Units Available in Stock</div>
+            <div class="kpi-value" id="adminKpiUnits">--</div>
+          </div>
+          <div class="kpi-icon icon-green">🩸</div>
+        </div>
+
+        <div class="kpi-card">
+          <div>
+            <div class="kpi-title">Total Blood Requests</div>
+            <div class="kpi-value" id="adminKpiRequests">--</div>
+          </div>
+          <div class="kpi-icon icon-yellow">📋</div>
+        </div>
+
+        <div class="kpi-card">
+          <div>
+            <div class="kpi-title">Units Issued & Dispatched</div>
+            <div class="kpi-value" id="adminKpiIssued">--</div>
+          </div>
+          <div class="kpi-icon icon-blue">🚚</div>
+        </div>
+      </div>
+
+      <!-- Admin Tab Navigation -->
+      <div class="portal-tabs">
+        <button class="portal-tab-btn active" data-admin-tab="inventory" onclick="setAdminTab('inventory')">📦 Blood Inventory</button>
+        <button class="portal-tab-btn" data-admin-tab="requests" onclick="setAdminTab('requests')">🚨 Blood Requests</button>
+        <button class="portal-tab-btn" data-admin-tab="donations" onclick="setAdminTab('donations')">❤️ Donor Collections</button>
+        <button class="portal-tab-btn" data-admin-tab="issues" onclick="setAdminTab('issues')">📜 Issuance Logs & Audit</button>
+        <button class="portal-tab-btn" data-admin-tab="users" onclick="setAdminTab('users')">👥 User Directory</button>
+      </div>
+
+      <!-- Tab 1: Blood Inventory Management -->
+      <div id="admin_inventoryTab" class="table-card">
+        <div class="table-header-row">
+          <div>
+            <h3 style="font-size: 1.25rem;">Live Stock Inventory</h3>
+            <p style="font-size: 0.85rem; color: var(--text-muted);">Adjust stock units and configure minimum safety thresholds.</p>
+          </div>
+        </div>
+
+        <div class="table-responsive">
+          <table class="custom-table">
+            <thead>
+              <tr>
+                <th>Blood Group</th>
+                <th>Units in Stock</th>
+                <th>Safety Threshold</th>
+                <th>Status</th>
+                <th>Quick Actions</th>
+              </tr>
+            </thead>
+            <tbody id="adminInventoryTbody">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Tab 2: Blood Requests Queue -->
+      <div id="admin_requestsTab" class="table-card" style="display: none;">
+        <div class="table-header-row">
+          <div>
+            <h3 style="font-size: 1.25rem;">Patient & Hospital Blood Requests</h3>
+            <p style="font-size: 0.85rem; color: var(--text-muted);">Triage pending blood requests, approve for issuance, or dispatch units.</p>
+          </div>
+        </div>
+
+        <div class="table-responsive">
+          <table class="custom-table">
+            <thead>
+              <tr>
+                <th>Req ID</th>
+                <th>Patient Name</th>
+                <th>Blood Group</th>
+                <th>Units</th>
+                <th>Hospital</th>
+                <th>Urgency</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="adminRequestsTbody">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Tab 3: Donation Verification Desk -->
+      <div id="admin_donationsTab" class="table-card" style="display: none;">
+        <div class="table-header-row">
+          <div>
+            <h3 style="font-size: 1.25rem;">Donor Appointments & Collection Logs</h3>
+            <p style="font-size: 0.85rem; color: var(--text-muted);">Verify medical screening, complete blood donations, and automatically add to inventory.</p>
+          </div>
+        </div>
+
+        <div class="table-responsive">
+          <table class="custom-table">
+            <thead>
+              <tr>
+                <th>Donation ID</th>
+                <th>Donor Name</th>
+                <th>Blood Group</th>
+                <th>Units</th>
+                <th>Date</th>
+                <th>Center</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="adminDonationsTbody">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Tab 4: Issuance Logs & Audit Certificates -->
+      <div id="admin_issuesTab" class="table-card" style="display: none;">
+        <div class="table-header-row">
+          <div>
+            <h3 style="font-size: 1.25rem;">Blood Issuance & Distribution Registry</h3>
+            <p style="font-size: 0.85rem; color: var(--text-muted);">Official audit trail of all blood units dispatched with unique digital certificate IDs.</p>
+          </div>
+        </div>
+
+        <div class="table-responsive">
+          <table class="custom-table">
+            <thead>
+              <tr>
+                <th>Certificate #</th>
+                <th>Issued To</th>
+                <th>Blood Group</th>
+                <th>Units</th>
+                <th>Hospital</th>
+                <th>Issued By</th>
+                <th>Date & Time</th>
+                <th>Receipt</th>
+              </tr>
+            </thead>
+            <tbody id="adminIssuesTbody">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Tab 5: Users Directory -->
+      <div id="admin_usersTab" class="table-card" style="display: none;">
+        <div class="table-header-row">
+          <div>
+            <h3 style="font-size: 1.25rem;">Registered Users Directory</h3>
+            <p style="font-size: 0.85rem; color: var(--text-muted);">All registered Administrators, Donors, and Patients in the system.</p>
+          </div>
+        </div>
+
+        <div class="table-responsive">
+          <table class="custom-table">
+            <thead>
+              <tr>
+                <th>User ID</th>
+                <th>Full Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Blood Group</th>
+                <th>Role</th>
+                <th>City</th>
+              </tr>
+            </thead>
+            <tbody id="adminUsersTbody">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- =========================================================
+       VIEW 3: DONOR PORTAL
+       ========================================================= -->
+  <main id="donorView" class="portal-layout" style="display: none;">
+    <div class="container">
+      <div class="portal-header">
+        <div class="portal-welcome">
+          <div class="user-avatar-lg">❤️</div>
+          <div>
+            <h1 style="font-size: 1.85rem;">Donor Dashboard</h1>
+            <p style="color: var(--text-secondary); font-size: 0.95rem;">Track your donation appointments, view your digital donor card, and monitor lives saved.</p>
+          </div>
+        </div>
+
+        <button class="btn btn-primary" onclick="openModal('scheduleDonationModal')">
+          ➕ Schedule Next Donation
+        </button>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1.6fr; gap: 2rem; margin-bottom: 2.5rem;">
+        <!-- Digital Donor ID Card -->
+        <div class="digital-donor-card">
+          <div class="donor-card-top">
+            <div class="donor-card-brand">
+              <span>🩸</span> PulseLife Official Donor
+            </div>
+            <div class="donor-blood-symbol" id="donorCardGroup">O+</div>
+          </div>
+
+          <div class="donor-card-body">
+            <div class="donor-card-name" id="donorCardName">Alex Morgan</div>
+            <div class="donor-card-meta">
+              <div>Email: <span id="donorCardEmail">alex@example.com</span></div>
+              <div>Phone: <span id="donorCardPhone">+1 555-0142</span></div>
+              <div>City: <span id="donorCardCity">Metro City</span></div>
+            </div>
+          </div>
+
+          <div class="donor-card-footer">
+            <div>
+              <div style="font-size: 0.75rem; text-transform: uppercase; color: rgba(255,255,255,0.6);">Donor Status</div>
+              <div style="font-weight: 800; color: #34d399;">✓ Verified Active Donor</div>
+            </div>
+            <div style="font-family: monospace; font-size: 0.8rem; background: rgba(0,0,0,0.3); padding: 0.3rem 0.6rem; border-radius: 6px;">
+              QR-AUTH-VALID
+            </div>
+          </div>
+        </div>
+
+        <!-- Donor Impact Summary -->
+        <div class="table-card" style="margin-bottom: 0; display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <h3 style="font-size: 1.3rem; margin-bottom: 0.5rem;">Your Life-Saving Impact</h3>
+            <p style="color: var(--text-secondary); font-size: 0.95rem;">Each whole blood donation can save up to 3 individual patients in critical conditions.</p>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1.5rem 0;">
+            <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-subtle); border-radius: 12px; padding: 1.25rem;">
+              <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase;">Estimated Lives Saved</div>
+              <div style="font-size: 2.2rem; font-weight: 800; color: #ff6b6b;" id="donorImpactCount">6</div>
+            </div>
+            <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-subtle); border-radius: 12px; padding: 1.25rem;">
+              <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase;">Donor Badge</div>
+              <div style="font-size: 1.3rem; font-weight: 800; color: #fbbf24; margin-top: 0.4rem;">🌟 Silver Hero</div>
+            </div>
+          </div>
+
+          <button class="btn btn-secondary" onclick="openModal('scheduleDonationModal')">
+            Book New Donation Slot →
+          </button>
+        </div>
+      </div>
+
+      <!-- Donor Donation History Table -->
+      <div class="table-card">
+        <div class="table-header-row">
+          <div>
+            <h3 style="font-size: 1.25rem;">My Donation History</h3>
+            <p style="font-size: 0.85rem; color: var(--text-muted);">Complete record of all your past blood donation appointments and verified collection logs.</p>
+          </div>
+        </div>
+
+        <div class="table-responsive">
+          <table class="custom-table">
+            <thead>
+              <tr>
+                <th>Donation ID</th>
+                <th>Blood Group</th>
+                <th>Units</th>
+                <th>Date</th>
+                <th>Center</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="donorHistoryTbody">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- =========================================================
+       VIEW 4: PATIENT / REQUESTER PORTAL
+       ========================================================= -->
+  <main id="patientView" class="portal-layout" style="display: none;">
+    <div class="container">
+      <div class="portal-header">
+        <div class="portal-welcome">
+          <div class="user-avatar-lg">🏥</div>
+          <div>
+            <h1 style="font-size: 1.85rem;">Patient & Hospital Requester Desk</h1>
+            <p style="color: var(--text-secondary); font-size: 0.95rem;">Welcome, <span id="patientWelcomeName">Patient</span>. Submit emergency blood requests and track delivery in real time.</p>
+          </div>
+        </div>
+
+        <button class="btn btn-primary" onclick="openModal('bloodRequestModal')">
+          🚨 Submit New Blood Request
+        </button>
+      </div>
+
+      <!-- Emergency Quick Action Banner -->
+      <div style="background: linear-gradient(135deg, rgba(239,68,68,0.15), rgba(181,23,158,0.15)); border: 1px solid rgba(239,68,68,0.3); border-radius: 16px; padding: 1.5rem; margin-bottom: 2rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+        <div>
+          <h3 style="color: #fca5a5; font-size: 1.15rem; margin-bottom: 0.25rem;">Need Critical Blood Transfusion Immediately?</h3>
+          <p style="color: var(--text-secondary); font-size: 0.9rem;">Mark urgency as "CRITICAL" during request submission for immediate expedited triage by our 24/7 staff.</p>
+        </div>
+        <button class="btn btn-primary" onclick="openModal('bloodRequestModal')">
+          Request Blood Now
+        </button>
+      </div>
+
+      <!-- Patient Requests Table -->
+      <div class="table-card">
+        <div class="table-header-row">
+          <div>
+            <h3 style="font-size: 1.25rem;">My Submitted Blood Requests</h3>
+            <p style="font-size: 0.85rem; color: var(--text-muted);">Real-time status tracking for hospital blood requisitions.</p>
+          </div>
+        </div>
+
+        <div class="table-responsive">
+          <table class="custom-table">
+            <thead>
+              <tr>
+                <th>Req ID</th>
+                <th>Blood Group</th>
+                <th>Units</th>
+                <th>Hospital</th>
+                <th>Urgency</th>
+                <th>Status</th>
+                <th>Receipt / Audit</th>
+              </tr>
+            </thead>
+            <tbody id="patientRequestsTbody">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- =========================================================
+       MODALS & POPUPS
+       ========================================================= -->
+
+  <!-- 1. Authentication Modal (Login / Register / Demo Swapper) -->
+  <div id="authModal" class="modal-backdrop">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div style="font-weight: 800; font-size: 1.25rem;">PulseLife Access Portal</div>
+        <button class="modal-close-btn" data-close-modal>&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <!-- 1-Click Demo Login Bar -->
+        <div class="demo-accounts-box">
+          <div class="demo-title">⚡ Instant Demo Fast-Login:</div>
+          <div class="demo-buttons">
+            <button class="btn btn-sm btn-outline-danger" data-demo-role="ROLE_ADMIN">Admin (Chief)</button>
+            <button class="btn btn-sm btn-secondary" data-demo-role="ROLE_DONOR">Donor (Alex)</button>
+            <button class="btn btn-sm btn-secondary" data-demo-role="ROLE_PATIENT">Patient (Sarah)</button>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 0.5rem; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border-subtle); padding-bottom: 0.5rem;">
+          <button id="authTabLoginBtn" class="portal-tab-btn active" onclick="switchAuthTab('login')">Sign In</button>
+          <button id="authTabRegBtn" class="portal-tab-btn" onclick="switchAuthTab('register')">Register New Account</button>
+        </div>
+
+        <!-- Login Tab -->
+        <div id="loginTabContent">
+          <form id="loginForm">
+            <div class="form-group">
+              <label class="form-label">Username or Email</label>
+              <input type="text" id="loginUsername" class="form-control" placeholder="e.g. admin or donor_alex" required value="admin">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Password</label>
+              <input type="password" id="loginPassword" class="form-control" placeholder="••••••••" required value="admin123">
+            </div>
+            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Sign In</button>
+          </form>
+        </div>
+
+        <!-- Register Tab -->
+        <div id="registerTabContent" style="display: none;">
+          <form id="registerForm">
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Username</label>
+                <input type="text" id="regUsername" class="form-control" placeholder="e.g. john_doe" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Password</label>
+                <input type="password" id="regPassword" class="form-control" placeholder="••••••••" required>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Full Name</label>
+              <input type="text" id="regFullName" class="form-control" placeholder="e.g. John Doe" required>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Email Address</label>
+                <input type="email" id="regEmail" class="form-control" placeholder="john@example.com" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Phone Number</label>
+                <input type="tel" id="regPhone" class="form-control" placeholder="+1 555-0123" required>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Account Role</label>
+                <select id="regRole" class="form-control" required>
+                  <option value="ROLE_DONOR">Blood Donor</option>
+                  <option value="ROLE_PATIENT">Patient / Hospital Requester</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Blood Group</label>
+                <select id="regBloodGroup" class="form-control" required>
+                  <option value="A+">A+</option>
+                  <option value="A-">A-</option>
+                  <option value="B+">B+</option>
+                  <option value="B-">B-</option>
+                  <option value="AB+">AB+</option>
+                  <option value="AB-">AB-</option>
+                  <option value="O+" selected>O+</option>
+                  <option value="O-">O-</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Age</label>
+                <input type="number" id="regAge" class="form-control" min="18" max="70" value="26">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Gender</label>
+                <select id="regGender" class="form-control">
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">City / Location</label>
+              <input type="text" id="regCity" class="form-control" placeholder="e.g. Springfield" required>
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Create Account</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. Schedule Blood Donation Modal -->
+  <div id="scheduleDonationModal" class="modal-backdrop">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div style="font-weight: 800; font-size: 1.25rem;">Schedule Blood Donation Appointment</div>
+        <button class="modal-close-btn" data-close-modal>&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="scheduleDonationForm">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Blood Group</label>
+              <select id="donationBloodGroup" class="form-control">
+                <option value="A+">A+</option>
+                <option value="A-">A-</option>
+                <option value="B+">B+</option>
+                <option value="B-">B-</option>
+                <option value="AB+">AB+</option>
+                <option value="AB-">AB-</option>
+                <option value="O+" selected>O+</option>
+                <option value="O-">O-</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Units to Donate</label>
+              <input type="number" id="donationUnits" class="form-control" value="1" min="1" max="2" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Preferred Donation Date</label>
+            <input type="date" id="donationDate" class="form-control" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Donation Center / Hospital Wing</label>
+            <select id="donationHospital" class="form-control" required>
+              <option value="City Central Blood Center">City Central Blood Center</option>
+              <option value="Metropolitan Red Cross">Metropolitan Red Cross</option>
+              <option value="Riverdale Community Clinic">Riverdale Community Clinic</option>
+              <option value="Mobile Blood Donation Drive #4">Mobile Blood Donation Drive #4</option>
+            </select>
+          </div>
+
+          <div style="margin: 1.25rem 0; background: rgba(255,255,255,0.03); padding: 1rem; border-radius: 8px; border: 1px solid var(--border-subtle);">
+            <label style="display: flex; align-items: center; gap: 0.75rem; font-size: 0.9rem; cursor: pointer;">
+              <input type="checkbox" id="donationHealthCheck" checked required>
+              <span>I confirm I am feeling healthy, weigh over 50kg, and have not had a major surgery or piercing in the last 6 months.</span>
+            </label>
+          </div>
+
+          <div class="modal-footer" style="padding: 1rem 0 0 0;">
+            <button type="button" class="btn btn-secondary" data-close-modal>Cancel</button>
+            <button type="submit" class="btn btn-primary">Confirm Appointment</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. Urgent Blood Request Modal -->
+  <div id="bloodRequestModal" class="modal-backdrop">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div style="font-weight: 800; font-size: 1.25rem;">Submit Blood Requisition</div>
+        <button class="modal-close-btn" data-close-modal>&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="bloodRequestForm">
+          <div class="form-group">
+            <label class="form-label">Patient Full Name</label>
+            <input type="text" id="reqPatientName" class="form-control" placeholder="Patient receiving transfusion" required>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Required Blood Group</label>
+              <select id="reqBloodGroup" class="form-control" required>
+                <option value="A+">A+</option>
+                <option value="A-">A-</option>
+                <option value="B+">B+</option>
+                <option value="B-">B-</option>
+                <option value="AB+">AB+</option>
+                <option value="AB-">AB-</option>
+                <option value="O+">O+</option>
+                <option value="O-" selected>O-</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Units Needed</label>
+              <input type="number" id="reqUnits" class="form-control" value="1" min="1" max="10" required>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Hospital / Clinic Name</label>
+              <input type="text" id="reqHospital" class="form-control" placeholder="e.g. City General Trauma ICU" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Attending Doctor Name</label>
+              <input type="text" id="reqDoctor" class="form-control" placeholder="e.g. Dr. Reed">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Urgency Priority</label>
+            <select id="reqUrgency" class="form-control" required>
+              <option value="NORMAL">Normal (Within 24 Hours)</option>
+              <option value="URGENT">Urgent (Within 6 Hours)</option>
+              <option value="CRITICAL" selected>CRITICAL (Immediate Emergency Dispatch)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Clinical Reason / Purpose</label>
+            <textarea id="reqReason" class="form-control" rows="2" placeholder="e.g. Emergency surgery, trauma accident, severe anemia" required></textarea>
+          </div>
+
+          <div class="modal-footer" style="padding: 1rem 0 0 0;">
+            <button type="button" class="btn btn-secondary" data-close-modal>Cancel</button>
+            <button type="submit" class="btn btn-primary">Submit Requisition</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. Stock Edit Modal (Admin) -->
+  <div id="stockAdjustModal" class="modal-backdrop">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div style="font-weight: 800; font-size: 1.25rem;">Adjust Blood Stock Level</div>
+        <button class="modal-close-btn" data-close-modal>&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="stockAdjustForm">
+          <div class="form-group">
+            <label class="form-label">Blood Group</label>
+            <select id="adjustBloodGroup" class="form-control" required>
+              <option value="A+">A+</option>
+              <option value="A-">A-</option>
+              <option value="B+">B+</option>
+              <option value="B-">B-</option>
+              <option value="AB+">AB+</option>
+              <option value="AB-">AB-</option>
+              <option value="O+">O+</option>
+              <option value="O-">O-</option>
+            </select>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Units in Reserve</label>
+              <input type="number" id="adjustUnits" class="form-control" min="0" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Safety Minimum Threshold</label>
+              <input type="number" id="adjustThreshold" class="form-control" min="1" value="10" required>
+            </div>
+          </div>
+
+          <div class="modal-footer" style="padding: 1rem 0 0 0;">
+            <button type="button" class="btn btn-secondary" data-close-modal>Cancel</button>
+            <button type="submit" class="btn btn-primary">Save Inventory</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. Issue Blood Action Modal (Admin) -->
+  <div id="issueBloodModal" class="modal-backdrop">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div style="font-weight: 800; font-size: 1.25rem;">Dispatch Blood Units</div>
+        <button class="modal-close-btn" data-close-modal>&times;</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="issueReqId">
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-subtle); border-radius: 12px; padding: 1.25rem; margin-bottom: 1.25rem;">
+          <div style="margin-bottom: 0.5rem;"><strong>Patient:</strong> <span id="issuePatientName">--</span></div>
+          <div style="margin-bottom: 0.5rem;"><strong>Blood Group:</strong> <span id="issueBloodGroup" class="blood-tag">--</span></div>
+          <div style="margin-bottom: 0.5rem;"><strong>Units Requested:</strong> <span id="issueUnits">--</span></div>
+          <div><strong>Destination Hospital:</strong> <span id="issueHospital">--</span></div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Issuance Dispatch Notes / Cold Chain Seal #</label>
+          <input type="text" id="issueNotes" class="form-control" value="Inspected, sealed, and packaged at 4°C standard cold chain.">
+        </div>
+
+        <div class="modal-footer" style="padding: 1rem 0 0 0;">
+          <button type="button" class="btn btn-secondary" data-close-modal>Cancel</button>
+          <button type="button" class="btn btn-success" onclick="confirmIssueBlood()">Confirm Issue & Deduct Stock</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6. Official Digital Issuance Certificate / Receipt Modal -->
+  <div id="certificateModal" class="modal-backdrop">
+    <div class="modal-card" style="max-width: 650px;">
+      <div class="modal-header">
+        <div style="font-weight: 800; font-size: 1.25rem;">Official Blood Issuance Voucher</div>
+        <button class="modal-close-btn" data-close-modal>&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="certificate-view" id="printableCertificate">
+          <div class="certificate-header">
+            <div class="certificate-logo">🩸 PULSELIFE BLOOD BANK NETWORK</div>
+            <div class="certificate-title">Official Blood Issuance Certificate</div>
+            <div style="font-size: 0.82rem; color: #64748b; font-family: monospace;">Certificate #: <span id="certNumber">--</span></div>
+          </div>
+
+          <div class="certificate-details">
+            <div>
+              <div class="cert-field-label">Recipient / Patient</div>
+              <div class="cert-field-value" id="certPatient">--</div>
+            </div>
+            <div>
+              <div class="cert-field-label">Blood Group & Units</div>
+              <div class="cert-field-value" style="color: #e63946;"><span id="certBloodGroup">--</span> (<span id="certUnits">--</span>)</div>
+            </div>
+            <div>
+              <div class="cert-field-label">Hospital / Center</div>
+              <div class="cert-field-value" id="certHospital">--</div>
+            </div>
+            <div>
+              <div class="cert-field-label">Issuing Medical Officer</div>
+              <div class="cert-field-value" id="certOfficer">--</div>
+            </div>
+            <div>
+              <div class="cert-field-label">Issue Timestamp</div>
+              <div class="cert-field-value" id="certDate">--</div>
+            </div>
+            <div>
+              <div class="cert-field-label">Quality Clearance</div>
+              <div class="cert-field-value" style="color: #10b981;">✓ Tested & Cross-Matched</div>
+            </div>
+          </div>
+
+          <div style="margin-bottom: 1.5rem; font-size: 0.85rem; color: #475569;">
+            <strong>Dispatch Notes:</strong> <span id="certNotes">--</span>
+          </div>
+
+          <div class="certificate-footer">
+            <div style="font-size: 0.75rem; color: #64748b;">
+              PulseLife Central Blood Repository • Certified ISO 15189 Quality Compliant
+            </div>
+            <div style="text-align: right;">
+              <div style="font-family: cursive; font-size: 1.1rem; color: #1e293b;">Verified & Authorized</div>
+              <div style="font-size: 0.7rem; color: #94a3b8;">Digitally Signed</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer" style="padding: 1.25rem 0 0 0;">
+          <button class="btn btn-secondary" data-close-modal>Close</button>
+          <button class="btn btn-primary" onclick="printCertificate()">🖨️ Print Voucher</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toastContainer" class="toast-container"></div>
+
+  <!-- JavaScript Scripts -->
+  <script src="js/api.js"></script>
+  <script src="js/app.js"></script>
+
+  <!-- Pre-set default date on donation form -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const donationDateInput = document.getElementById('donationDate');
+      if (donationDateInput) {
+        donationDateInput.value = new Date().toISOString().split('T')[0];
+      }
+    });
+  </script>
+</body>
+</html>
